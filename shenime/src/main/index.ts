@@ -15,7 +15,6 @@ function createWindow(): void {
     title: 'Shenime',
     frame: true,
     backgroundMaterial: 'acrylic',
-    visualEffectState: 'active',
     titleBarStyle: 'default',
 
     webPreferences: {
