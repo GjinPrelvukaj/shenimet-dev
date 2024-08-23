@@ -1,13 +1,13 @@
 import { contextBridge } from 'electron'
 
 if (!process.contextIsolated) {
-  throw new Error('contextIsolation needs to be enabled')
+  throw new Error('contextIsolation must be enabled in the BrowserWindow')
 }
 
 try {
   contextBridge.exposeInMainWorld('context', {
-    //Todo
+    //TODO
   })
 } catch (error) {
-  console.log(error)
+  console.error(error)
 }
