@@ -9,6 +9,7 @@ declare global {
       readNote: ReadNote
       writeNote: WriteNote
       createNote: createNote
+      deleteNote: deleteNote
     }
   }
 }

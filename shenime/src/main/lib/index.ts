@@ -1,10 +1,12 @@
-import { appDirectoryName, fileEncoding } from '@shared/constants'
+import { appDirectoryName, fileEncoding, welcomeNoteFileName } from '@shared/constants'
 import { NoteInfo } from '@shared/models'
-import { CreateNote, GetNotes, ReadNote, WriteNote } from '@shared/types'
+import { CreateNote, DeleteNote, GetNotes, ReadNote, WriteNote } from '@shared/types'
 import { dialog } from 'electron'
-import { ensureDir, readFile, readdir, stat, writeFile } from 'fs-extra'
+import { ensureDir, readFile, readdir, remove, stat, writeFile } from 'fs-extra'
 import { homedir } from 'os'
 import path from 'path'
+import { isEmpty } from 'lodash'
+import welcomeNoteFile from '../../../resources/welcomeNote.md?asset'
 
 export const getRootDir = () => {
   return `${homedir()}\\${appDirectoryName}`
@@ -21,6 +23,16 @@ export const getNotes: GetNotes = async () => {
   })
 
   const notes = notesFileNames.filter((fileName) => fileName.endsWith('.md'))
+
+  if (isEmpty(notes)) {
+    console.log('No notes found')
+
+    const content = await readFile(welcomeNoteFile, { encoding: fileEncoding })
+
+    await writeFile(`${rootDir}\\${welcomeNoteFileName}`, content, { encoding: fileEncoding })
+
+    notes.push(welcomeNoteFileName)
+  }
 
   return Promise.all(notes.map(getNoteInfoFromFilename))
 }
@@ -83,4 +95,26 @@ export const createNote: CreateNote = async () => {
   await writeFile(filePath, '')
 
   return filename
+}
+
+export const deleteNote: DeleteNote = async (filename) => {
+  const rootDir = getRootDir()
+
+  const { response } = await dialog.showMessageBox({
+    type: 'warning',
+    title: 'Delete note',
+    message: `Are you sure you want to delete ${filename}?`,
+    buttons: ['Delete', 'Cancel'], // 0 is Delete, 1 is Cancel
+    defaultId: 1,
+    cancelId: 1
+  })
+
+  if (response === 1) {
+    console.info('Note deletion canceled')
+    return false
+  }
+
+  console.info(`Deleting note: ${filename}`)
+  await remove(`${rootDir}/${filename}.md`)
+  return true
 }
