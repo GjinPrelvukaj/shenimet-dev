@@ -8,6 +8,7 @@ declare global {
       getNotes: GetNotes
       readNote: ReadNote
       writeNote: WriteNote
+      createNote: createNote
     }
   }
 }
